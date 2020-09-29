@@ -5,17 +5,17 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
-    private static String separador = FileSystems.getDefault().getSeparator();
-    private static String filepath = String.format(
+    private static final String separador = FileSystems.getDefault().getSeparator();
+    private static final String filepath = String.format(
             "C:%sUsers%spc%sDesktop%sTecMilenio%s2020-08%sComputación en Java%sEntregables%sConsultorioClinico%sdb%s",
             separador, separador, separador, separador, separador, separador, separador, separador, separador, separador
     );
-    private static String fileUsuarios = "usuarios.txt";
-    private static String fileDoctores = "doctores.txt";
-    private static String filePacientes= "pacientes.txt";
-    private static String fileCitas = "citas.txt";
+    private static final String fileUsuarios = "usuarios.txt";
+    private static final String fileDoctores = "doctores.txt";
+    private static final String filePacientes= "pacientes.txt";
+    private static final String fileCitas = "citas.txt";
     private static String wait = "";
-    private static Scanner scn = new Scanner(System.in);
+    private static final Scanner scn = new Scanner(System.in);
 
 
     public static void main(String[] args) {
@@ -39,6 +39,94 @@ public class Main {
                     }
                 }
             }
+        }
+        String resultPrincipal;
+        boolean salirPrincipal = false;
+        while(!salirPrincipal){
+            System.out.println("Digite el número correspondiente a la opción deseada y presione 'Enter': \n" +
+                    "1)Doctores\n" +
+                    "2)Pacientes\n" +
+                    "3)Citas\n" +
+                    "4)Salir");
+            resultPrincipal = scn.nextLine();
+            switch (resultPrincipal) {
+                case "1":
+                    String resultDoctores = "";
+                    boolean salirDoctores = false;
+                    while(!salirDoctores){
+                        listElements(getInfoArchivo(fileDoctores));
+                        System.out.println("Digite el número correspondiente a la opción deseada y presione 'Enter': \n" +
+                                "1)Agregar doctor\n" +
+                                "2)Salir al menú pricipal\n");
+                        resultDoctores = scn.nextLine();
+                        switch (resultDoctores){
+                            case "1":
+                                String nombre;
+                                String especialidad;
+                                boolean salirDoctores2 = false;
+                                while (!salirDoctores2){
+                                    System.out.println("Ingrese el nombre del doctor y presione 'Enter': \n");
+                                    nombre = scn.nextLine();
+                                    if (nombre.isEmpty()){
+                                        System.out.println("El campo nombre no debe ir vacío");
+                                    }else {
+                                        while (!salirDoctores2) {
+                                            System.out.println("Ingrese la especialidad del doctor y presione 'Enter': \n");
+                                            especialidad = scn.nextLine();
+                                            if (especialidad.isEmpty()) {
+                                                System.out.println("El campo especialidad no debe ir vacío");
+                                            } else {
+                                                Doctor doctor = new Doctor(getInfoArchivo(fileDoctores).size(), nombre, especialidad);
+                                                saveElement(fileDoctores, doctor, null, null);
+                                                System.out.println("Registro guardado correctamente");
+                                                salirDoctores2 = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case "2":
+                                salirDoctores = true;
+                                break;
+                        }
+                    }
+
+                    break;
+                case "2":
+
+                    break;
+                case "3":
+
+                    break;
+                case "4":
+                    salirPrincipal = true;
+                    break;
+            }
+        }
+
+        //saveElement(getInfoArchivo(fileDoctores), null, null, null);
+    }
+
+    private static void listElements(HashMap<String, String> registros){
+
+    }
+
+    private  static void saveElement(String archivo, Doctor doctor, Paciente paciente, Cita cita){
+        HashMap<String, String> registros = getInfoArchivo(archivo);
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(filepath + archivo, true));
+            if (cita != null){
+                bw.write(cita.id_cita + "\t" + cita.id_doctor + "," + cita.id_paciente + "," +
+                        cita.fechaHora + "," + cita.motivo);
+            }else if (doctor != null){
+                bw.write(doctor.id_doctor + "\t" + doctor.nombre + "," + doctor.especialidad);
+            }else if (paciente != null){
+                bw.write(paciente.id_paciente + "\t" + paciente.nombre);
+            }
+            bw.newLine();
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -83,8 +171,9 @@ public class Main {
                     bw.newLine();
                     bw.flush();
                 }else{
+                    String[] nomArchivo = archivo.split(".");
                     mensaje = "No existe archivo de registro para " +
-                            "'" + archivo.split(".")[0] + "'. \n" +
+                            "'" + archivo + "'. \n" +
                             "Se creará uno nuevo. \n";
                     file.createNewFile();
                 }
@@ -97,4 +186,5 @@ public class Main {
         }
         return registros;
     }
+
 }
